@@ -44,14 +44,13 @@ java {
 
 // NeoGradle 7.1.x can ask the NeoForm source-transform stage for an access transformer
 // file under build/tmp/.cache/expanded/<neoform-zip>/ats even when the upstream NeoForm
-// zip does not contain that path on clean Linux runners. Create an empty fallback in
-// the expanded workspace so CI can transform sources without needing project ATs.
+// zip does not contain that path on clean Linux runners. The expanded zip directory is
+// created while resolving the transform task, so this fallback must run as a doFirst on
+// neoFormTransformSource rather than as an earlier dependency task.
 def neoFormExpandedRoot = layout.buildDirectory.dir('tmp/.cache/expanded')
 
-tasks.register('prepareNeoFormAccessTransformerFallback') {
-    dependsOn tasks.named('neoFormPatchUserDev')
-
-    doLast {
+tasks.matching { it.name == 'neoFormTransformSource' }.configureEach {
+    doFirst('prepareNeoFormAccessTransformerFallback') {
         File expandedRoot = neoFormExpandedRoot.get().asFile
         if (!expandedRoot.isDirectory()) {
             return
@@ -65,10 +64,6 @@ tasks.register('prepareNeoFormAccessTransformerFallback') {
             }
         }
     }
-}
-
-tasks.matching { it.name == 'neoFormTransformSource' }.configureEach {
-    dependsOn tasks.named('prepareNeoFormAccessTransformerFallback')
 }
 
 // Default run configurations.
