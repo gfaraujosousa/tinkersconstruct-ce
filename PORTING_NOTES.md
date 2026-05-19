@@ -35,7 +35,8 @@
 - Real fluid registration and tank/block-entity storage are not ported yet; early melting/casting recipes reference fluid ids and output representative items.
 - Smeltery/foundry multiblock validation is not ported yet.
 - Worldgen, slime content, guidebooks, JEI integration, entities, client renderers, and books are not ported yet.
-- Datapack reload listeners for material/modifier JSON are not implemented yet; the records/codecs are in place with built-in bootstrap data.
+- Material and modifier JSON reload listeners are implemented for `data/<namespace>/tinkering/materials` and `data/<namespace>/tinkering/modifiers`.
+- Tool definitions and station layouts are not datapack-loaded yet.
 
 ## Tests And Commands
 
@@ -51,7 +52,7 @@
   - The command was stopped by the smoke-test timeout because a dedicated server remains running by design.
 - `.\gradlew.bat runGameTestServer`
   - Passed after adding `TConstructCEGameTests` and an empty structure template under `data/tconstruct_ce/structure/empty.nbt`.
-  - Current tests: tool receives haste modifier, broken tool keeps its stack.
+  - Current tests: datapack tool data loads, tool receives haste modifier, broken tool keeps its stack.
 
 ## Known Blockers
 

@@ -48,7 +48,7 @@ public record ToolStackData(ResourceLocation definition, List<ResourceLocation> 
 
     public ToolStackData addModifier(ResourceLocation modifierId) {
         List<ModifierEntry> updated = new ArrayList<>(modifiers);
-        ModifierDefinition modifier = ToolData.MODIFIERS.get(modifierId);
+        ModifierDefinition modifier = ToolData.modifier(modifierId);
         int maxLevel = modifier == null ? 1 : modifier.maxLevel();
         for (int i = 0; i < updated.size(); i++) {
             ModifierEntry existing = updated.get(i);
@@ -64,13 +64,13 @@ public record ToolStackData(ResourceLocation definition, List<ResourceLocation> 
     public ToolStats resolvedStats() {
         ToolStats result = new ToolStats(1, 1.0F, 1.0F, 1.0F);
         for (ResourceLocation materialId : materials) {
-            MaterialDefinition material = ToolData.MATERIALS.get(materialId);
+            MaterialDefinition material = ToolData.material(materialId);
             if (material != null) {
                 result = result.add(material.stats());
             }
         }
         for (ModifierEntry entry : modifiers) {
-            ModifierDefinition modifier = ToolData.MODIFIERS.get(entry.id());
+            ModifierDefinition modifier = ToolData.modifier(entry.id());
             if (modifier != null) {
                 for (int i = 0; i < entry.level(); i++) {
                     result = result.add(modifier.statBonus());

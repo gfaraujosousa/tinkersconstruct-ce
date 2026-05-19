@@ -4,6 +4,7 @@ import com.gfaraujosousa.tconstruct.TinkersConstructCommunityEdition;
 import com.gfaraujosousa.tconstruct.item.ModifiableToolItem;
 import com.gfaraujosousa.tconstruct.registry.TCComponents;
 import com.gfaraujosousa.tconstruct.registry.TCItems;
+import com.gfaraujosousa.tconstruct.tool.ToolData;
 import com.gfaraujosousa.tconstruct.tool.ToolStackData;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -15,6 +16,15 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 @PrefixGameTestTemplate(false)
 public final class TConstructCEGameTests {
     private TConstructCEGameTests() {
+    }
+
+    @GameTest(template = "empty", timeoutTicks = 20)
+    public static void datapackToolDataLoaded(GameTestHelper helper) {
+        helper.assertTrue(ToolData.material(ToolStackData.FLINT) != null, "Expected flint material to load from datapack JSON");
+        helper.assertTrue(ToolData.modifier(ToolStackData.HASTE) != null, "Expected haste modifier to load from datapack JSON");
+        helper.assertTrue(ToolData.material(ToolStackData.FLINT).stats().durability() == 64, "Expected flint material durability from JSON");
+        helper.assertTrue(ToolData.modifier(ToolStackData.HASTE).maxLevel() == 3, "Expected haste modifier max level from JSON");
+        helper.succeed();
     }
 
     @GameTest(template = "empty", timeoutTicks = 20)
