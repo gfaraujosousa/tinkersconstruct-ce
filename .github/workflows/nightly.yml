@@ -38,7 +38,7 @@ jobs:
         run: ./gradlew $NEOGRADLE_CI_ARGS clean build runData --no-build-cache
 
       - name: Upload nightly jars
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tconstruct-ce-nightly-${{ github.sha }}
           path: build/libs/*.jar
@@ -46,7 +46,7 @@ jobs:
 
       - name: Upload nightly logs
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: tconstruct-ce-nightly-logs-${{ github.sha }}
           path: |
