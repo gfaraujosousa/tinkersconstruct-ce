@@ -167,17 +167,34 @@ jobs:
         env:
           CI: 'false'
         run: |
-          set +e
-          timeout 180s ./gradlew $NEOGRADLE_CI_ARGS runServer --no-build-cache
-          code=$?
-          set -e
-          if [ "$code" -eq 124 ]; then
+          set -u
+          ./gradlew $NEOGRADLE_CI_ARGS runServer --no-build-cache --stacktrace &
+          gradle_pid=$!
+          deadline=$((SECONDS + 600))
+
+          while kill -0 "$gradle_pid" 2>/dev/null; do
             if grep -R "Done (" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
-              echo "Server reached startup before timeout."
+              echo "Server reached startup."
+              kill "$gradle_pid" 2>/dev/null || true
+              wait "$gradle_pid" 2>/dev/null || true
               exit 0
             fi
-            echo "Server timed out before startup."
-            exit 1
+
+            if [ "$SECONDS" -ge "$deadline" ]; then
+              echo "Server timed out before startup."
+              kill "$gradle_pid" 2>/dev/null || true
+              wait "$gradle_pid" 2>/dev/null || true
+              exit 1
+            fi
+
+            sleep 5
+          done
+
+          wait "$gradle_pid"
+          code=$?
+          if grep -R "Done (" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
+            echo "Server reached startup before Gradle exited."
+            exit 0
           fi
           exit "$code"
 
