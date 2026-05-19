@@ -23,6 +23,20 @@ This file records reproducible findings from the local MIT-licensed upstream jar
 
 These paths are intentionally ignored by `.gitignore`.
 
+## Curated Resource Imports
+
+- Imported the original upstream `assets/tconstruct/Credits.txt` into the CE namespace to preserve asset credits.
+- Imported selected upstream texture folders for current foundation visuals:
+  - `textures/block/table`
+  - `textures/block/smeltery/casting`
+  - `textures/block/smeltery/controller`
+  - `textures/block/smeltery/seared`
+  - `textures/item/materials`
+  - `textures/item/cast`
+  - `textures/item/tool/pickaxe`
+- Current CE models intentionally use vanilla-compatible model JSONs that reference the imported `tconstruct_ce` textures.
+- Upstream model JSONs using `mantle:retextured`, `tconstruct:material`, or blockstate properties not yet present in CE were not copied directly; they remain behavioral evidence for later Mantle/client model milestones.
+
 ## TConstruct Jar Inventory
 
 - Total jar entries: `29731`

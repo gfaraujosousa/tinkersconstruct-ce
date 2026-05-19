@@ -1,1 +1,12 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/crafting_table_top"}}
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "particle": "tconstruct_ce:block/table/tinker_station_top",
+    "down": "tconstruct_ce:block/table/bottom",
+    "up": "tconstruct_ce:block/table/tinker_station_top",
+    "north": "tconstruct_ce:block/table/side",
+    "south": "tconstruct_ce:block/table/side",
+    "east": "tconstruct_ce:block/table/side",
+    "west": "tconstruct_ce:block/table/side"
+  }
+}

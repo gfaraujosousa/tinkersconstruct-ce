@@ -1,1 +1,6 @@
-{"parent":"minecraft:block/cube_all","textures":{"all":"minecraft:block/polished_deepslate"}}
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "tconstruct_ce:block/smeltery/seared/bricks"
+  }
+}

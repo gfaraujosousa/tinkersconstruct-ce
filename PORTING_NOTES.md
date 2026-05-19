@@ -43,6 +43,14 @@
 - Feature status and priorities are tracked in `FEATURE_PARITY_MATRIX.md`.
 - Migration execution checklist is tracked in `MIGRATION_CHECKLIST.md`.
 
+## Resource Import Strategy
+
+- Milestone 2 has started with a safe visual asset import instead of a wholesale data import.
+- Imported selected original TConstruct 1.20.1 sprites/textures from `reverse_engineering/tconstruct_resources/assets/tconstruct` into `src/main/resources/assets/tconstruct_ce`.
+- Imported upstream `assets/tconstruct/Credits.txt` as `assets/tconstruct_ce/Credits.txt` to preserve asset attribution.
+- Updated current CE block/item models to use upstream textures under the `tconstruct_ce` namespace while avoiding unsupported upstream custom model loaders such as `mantle:retextured` and `tconstruct:material`.
+- Deferred bulk upstream recipes, worldgen, blockstates with unported block properties, and custom-loader models until the matching registries/serializers/loaders exist.
+
 ## CI/CD And Release Automation
 
 - Added GitHub Actions CI in `.github/workflows/ci.yml`.
@@ -69,6 +77,7 @@
 - Main mod bootstrap, config, mod metadata, and creative tab.
 - Core blocks: part builder, tinker station, modifier worktable, melter, casting table, seared bricks.
 - Core items: blank pattern, flint parts, flint pickaxe, redstone upgrade, gold pick head cast, molten gold ingot.
+- Visual resources: current foundation blocks/items now use original upstream TConstruct textures and sprites where compatible.
 - Tool data model: material ids, modifier entries, tool stats, tool stack data component, broken-state durability behavior.
 - Basic gameplay loop:
   - Craft flint parts from blank patterns and flint.
@@ -97,6 +106,10 @@
   - Passed after the first CE implementation batch.
 - `.\gradlew.bat runData`
   - Passed. The mod boots in the data generator; no providers are registered yet, so no generated files were emitted beyond the cache.
+- `.\gradlew.bat clean build --no-build-cache`
+  - Passed after the NeoForm transformer fallback was refined.
+- `.\gradlew.bat runData --no-build-cache`
+  - Passed after selected upstream visual assets were imported.
 - `.\gradlew.bat runServer`
   - Reached dedicated server startup. Log line: `Done (23.433s)! For help, type "help"`.
   - The command was stopped by the smoke-test timeout because a dedicated server remains running by design.

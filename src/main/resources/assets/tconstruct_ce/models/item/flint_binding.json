@@ -1,1 +1,6 @@
-{"parent":"minecraft:item/generated","textures":{"layer0":"minecraft:item/flint"}}
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "tconstruct_ce:item/tool/pickaxe/binding_tconstruct_flint"
+  }
+}

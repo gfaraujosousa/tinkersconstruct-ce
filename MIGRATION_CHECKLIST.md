@@ -11,7 +11,7 @@ Status keys: `[ ]` not started, `[~]` partial, `[x]` completed for the current m
 - [x] Preserve original attribution to SlimeKnights and contributors.
 - [~] Add port maintainer metadata for `gfaraujosousa` consistently across README, mod metadata, changelog, and release notes.
 - [x] Ignore reverse-engineering scratch outputs with `.gitignore`.
-- [ ] Preserve upstream MIT license/credits when importing concrete resources/assets/data.
+- [~] Preserve upstream MIT license/credits when importing concrete resources/assets/data.
 
 ## Milestone 1: Upstream Inventory And Parity Map
 
@@ -25,13 +25,13 @@ Status keys: `[ ]` not started, `[~]` partial, `[x]` completed for the current m
 
 ## Milestone 2: Resource/Data Import Strategy
 
-- [ ] Decide per resource type whether to import directly, transform, or regenerate.
-- [ ] Implement namespace rewrite strategy from `tconstruct:` to `tconstruct_ce:` for CE-owned registries.
+- [~] Decide per resource type whether to import directly, transform, or regenerate.
+- [~] Implement namespace rewrite strategy from `tconstruct:` to `tconstruct_ce:` for CE-owned registries.
 - [ ] Preserve vanilla ids and common tags during rewrites.
 - [ ] Handle Forge 1.20.1 data such as biome modifiers with NeoForge 1.21.1 equivalents.
-- [ ] Import or generate a first safe slice of upstream lang/models/material data.
-- [ ] Run `.\gradlew.bat runData`.
-- [ ] Run `.\gradlew.bat build`.
+- [~] Import or generate a first safe slice of upstream lang/models/material data.
+- [x] Run `.\gradlew.bat runData`.
+- [x] Run `.\gradlew.bat build`.
 
 ## Milestone 3: Mantle CE Required Systems
 

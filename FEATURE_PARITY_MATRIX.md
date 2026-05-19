@@ -53,7 +53,7 @@ Statuses: `Not Started`, `Stub`, `Partial`, `Functional`, `Parity Candidate`, `B
 | Loot Tables | block/entity drops | 342 loot tables | Not Started | None | None | Needs namespace migration and registry parity. | P2 Major Content |
 | Creative Tabs | Sorted content groups | lang/assets/classes | Stub | `TCCreativeTabs` | None | Current tab has only foundation items. | P2 Major Content |
 | Sounds/Particles | sounds and particles | `sounds.json`, particle assets/classes | Not Started | None | None | Client/server registry pass needed. | P2 Major Content |
-| Models/Textures | core visuals | 435 blockstates, 1538 models, 12730 textures | Stub | current generated/simple assets | None | Must import/rewrite namespace carefully. | P2 Major Content |
+| Models/Textures | core visuals | 435 blockstates, 1538 models, 12730 textures | Partial | `src/main/resources/assets/tconstruct_ce/models`, `src/main/resources/assets/tconstruct_ce/textures` | `clean build`, `runData` | Selected upstream sprites/textures imported for current foundation blocks/items; custom-loader models and full namespace migration are deferred until Mantle/model systems exist. | P2 Major Content |
 | Datagen | Providers and generated data | upstream data provider classes | Partial | `src/main/java/.../data` | `runData` | Current providers are minimal. | P2 Major Content |
 | JEI/EMI/REI | Recipe viewer integration | plugin package and mods.toml optional JEI dep | Not Started | None | None | Optional only, guard behind mod checks. | P3 Polish/Compat |
 | Config Parity | Gameplay/client/server config | config classes | Partial | `TConstructCEConfig` | None | Current config is minimal. | P3 Polish/Compat |

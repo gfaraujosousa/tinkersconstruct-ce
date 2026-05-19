@@ -18,7 +18,7 @@ This repository targets Minecraft 1.21.1 on NeoForge using the existing NeoForge
 - Current artifact naming: `tconstruct-ce-neoforge-1.21.1-<version>.jar`
 - Source reference supplied in this workspace: compiled Mantle `1.20.1-1.11.104` and TConstruct `1.20.1-3.11.2.166` jars under `original_sources/`
 
-The current implementation ports a small functional foundation: core registries, a typed data-component tool stack, built-in flint material data, a haste modifier, basic part/tool items, early station blocks, a modifier crafting recipe, and early melting/casting recipe serializers.
+The current implementation ports a small functional foundation: core registries, a typed data-component tool stack, built-in flint material data, a haste modifier, basic part/tool items, early station blocks, selected upstream sprites/textures for foundation content, a modifier crafting recipe, and early melting/casting recipe serializers.
 
 ## Build And Test
 
