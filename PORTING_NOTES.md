@@ -61,6 +61,7 @@
 - Updated artifact base name to `tconstruct-ce-neoforge-1.21.1`.
 - Changed current mod version to `0.1.0-alpha.1` to match the documented alpha porting phase.
 - Added an explicit empty `META-INF/accesstransformer.cfg` and declared it in mod metadata after GitHub Actions on Linux failed during `neoFormTransformSource` while looking for a missing expanded `ats/accesstransformer.cfg`.
+- CI/release/nightly Gradle invocations now use `--no-build-cache` for NeoGradle tasks after GitHub Actions restored incomplete NeoForm transform cache state that referenced a missing `ats/accesstransformer.cfg`.
 
 ## Implemented In This Pass
 

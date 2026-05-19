@@ -84,10 +84,10 @@ jobs:
           echo "draft=$draft" >> "$GITHUB_OUTPUT"
 
       - name: Build release artifacts
-        run: ./gradlew clean build runData
+        run: ./gradlew clean build runData --no-build-cache
 
       - name: Run GameTest server
-        run: ./gradlew runGameTestServer
+        run: ./gradlew runGameTestServer --no-build-cache
 
       - name: Generate release notes
         shell: bash

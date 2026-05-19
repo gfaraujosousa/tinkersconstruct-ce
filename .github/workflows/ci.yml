@@ -72,10 +72,10 @@ jobs:
         run: ./gradlew --version
 
       - name: Build
-        run: ./gradlew clean build
+        run: ./gradlew clean build --no-build-cache
 
       - name: Run datagen
-        run: ./gradlew runData
+        run: ./gradlew runData --no-build-cache
 
       - name: Upload jars
         uses: actions/upload-artifact@v4
@@ -123,7 +123,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run GameTest server
-        run: ./gradlew runGameTestServer
+        run: ./gradlew runGameTestServer --no-build-cache
 
       - name: Upload game test logs
         if: always()
@@ -157,7 +157,7 @@ jobs:
         shell: bash
         run: |
           set +e
-          timeout 180s ./gradlew runServer
+          timeout 180s ./gradlew runServer --no-build-cache
           code=$?
           set -e
           if [ "$code" -eq 124 ]; then

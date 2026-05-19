@@ -30,7 +30,7 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build nightly
-        run: ./gradlew clean build runData
+        run: ./gradlew clean build runData --no-build-cache
 
       - name: Upload nightly jars
         uses: actions/upload-artifact@v4
