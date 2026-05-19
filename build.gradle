@@ -42,6 +42,35 @@ java {
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
+// NeoGradle 7.1.x can ask the NeoForm source-transform stage for an access transformer
+// file under build/tmp/.cache/expanded/<neoform-zip>/ats even when the upstream NeoForm
+// zip does not contain that path on clean Linux runners. Create an empty fallback in
+// the expanded workspace so CI can transform sources without needing project ATs.
+def neoFormExpandedRoot = layout.buildDirectory.dir('tmp/.cache/expanded')
+
+tasks.register('prepareNeoFormAccessTransformerFallback') {
+    dependsOn tasks.named('neoFormPatchUserDev')
+
+    doLast {
+        File expandedRoot = neoFormExpandedRoot.get().asFile
+        if (!expandedRoot.isDirectory()) {
+            return
+        }
+
+        expandedRoot.eachDir { File expandedZip ->
+            File accessTransformer = new File(expandedZip, 'ats/accesstransformer.cfg')
+            if (!accessTransformer.isFile()) {
+                accessTransformer.parentFile.mkdirs()
+                accessTransformer.text = '# Empty fallback generated for NeoGradle source transform.\n'
+            }
+        }
+    }
+}
+
+tasks.matching { it.name == 'neoFormTransformSource' }.configureEach {
+    dependsOn tasks.named('prepareNeoFormAccessTransformerFallback')
+}
+
 // Default run configurations.
 // These can be tweaked, removed, or duplicated as needed.
 runs {
