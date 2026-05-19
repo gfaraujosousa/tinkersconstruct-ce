@@ -61,7 +61,8 @@
 - Updated artifact base name to `tconstruct-ce-neoforge-1.21.1`.
 - Changed current mod version to `0.1.0-alpha.1` to match the documented alpha porting phase.
 - CI/release/nightly Gradle invocations now use `--no-build-cache` for NeoGradle tasks after GitHub Actions restored incomplete NeoForm transform cache state that referenced a missing `ats/accesstransformer.cfg`.
-- Added a narrowly scoped `neoFormTransformSource` `doFirst` workaround, `prepareNeoFormAccessTransformerFallback`, after GitHub Actions still failed during NeoForm source transformation on a clean Linux runner. The missing file is created in NeoGradle's temporary expanded zip path immediately before JST runs; it is not a TConstruct CE packaged mod resource.
+- Refined the NeoForm access transformer workaround to inspect `neoFormTransformSource.transformers.files` directly and create only missing generated `build/tmp/.cache/expanded/**/ats/accesstransformer.cfg` entries immediately before JST runs. This avoids guessing by directory scan and leaves real project AT misconfiguration visible.
+- CI build and datagen commands now include `--stacktrace` so any remaining GitHub-only NeoGradle failure has actionable logs.
 
 ## Implemented In This Pass
 
