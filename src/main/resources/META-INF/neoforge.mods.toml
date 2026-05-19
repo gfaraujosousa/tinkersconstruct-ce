@@ -39,15 +39,15 @@ displayName="${mod_name}" #mandatory
 #logoFile="examplemod.png" #optional
 
 # A text field displayed in the mod UI
-#credits="" #optional
+credits="Original Tinkers' Construct and Mantle are by SlimeKnights and contributors. Community port maintained by gfaraujosousa." #optional
 
 # The authors of the mod, displayed in the mod UI (optional)
-authors="SlimeKnights and contributors (original Tinkers' Construct/Mantle), gfaraujosousa and community contributors (community port)"
+authors="${mod_authors}"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-Tinkers' Construct Community Edition is an unofficial community port/fork for NeoForge.
-Original Tinkers' Construct and Mantle are by SlimeKnights and contributors.
+${mod_description}
+This is not an official SlimeKnights build.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

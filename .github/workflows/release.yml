@@ -1,0 +1,136 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*.*.*
+      - v*.*.*-*
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to release, without the leading v
+        required: true
+        type: string
+      prerelease:
+        description: Mark the GitHub Release as a prerelease
+        required: true
+        default: true
+        type: boolean
+      draft:
+        description: Create the GitHub Release as a draft
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build And Publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Resolve release version
+        id: version
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            version="${{ inputs.version }}"
+            tag="v${version}"
+          else
+            tag="${GITHUB_REF_NAME}"
+            version="${tag#v}"
+          fi
+
+          declared="$(grep '^mod_version=' gradle.properties | cut -d= -f2-)"
+          if [ "$version" != "$declared" ]; then
+            echo "Release version ${version} does not match gradle.properties mod_version=${declared}."
+            exit 1
+          fi
+
+          prerelease="false"
+          if [[ "$version" =~ (alpha|beta|rc) ]]; then
+            prerelease="true"
+          fi
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            prerelease="${{ inputs.prerelease }}"
+          fi
+
+          draft="false"
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            draft="${{ inputs.draft }}"
+          fi
+
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "prerelease=$prerelease" >> "$GITHUB_OUTPUT"
+          echo "draft=$draft" >> "$GITHUB_OUTPUT"
+
+      - name: Build release artifacts
+        run: ./gradlew clean build runData
+
+      - name: Run GameTest server
+        run: ./gradlew runGameTestServer
+
+      - name: Generate release notes
+        shell: bash
+        run: |
+          cat > release-notes.md <<'NOTES'
+          Tinkers' Construct Community Edition is an unofficial NeoForge 1.21.1 community port maintained by gfaraujosousa. Original Tinkers' Construct and Mantle are by SlimeKnights and contributors. This release is not an official SlimeKnights build.
+
+          ## Runtime
+
+          - Minecraft: 1.21.1
+          - NeoForge: 21.1.230
+          - Java: 21
+          - License: MIT, preserving original attribution
+          - Port maintainer: gfaraujosousa
+          - Original authors: SlimeKnights and contributors
+
+          ## Changelog
+          NOTES
+          awk '/^## \[/ { if (seen) exit; seen=1 } seen { print }' CHANGELOG.md >> release-notes.md
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: TConstruct CE ${{ steps.version.outputs.version }}
+          body_path: release-notes.md
+          prerelease: ${{ steps.version.outputs.prerelease }}
+          draft: ${{ steps.version.outputs.draft }}
+          files: |
+            build/libs/*.jar
+            CHANGELOG.md
+            README.md
+            PORTING_NOTES.md
+            TEMPLATE_LICENSE.txt
+
+      - name: Upload release logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tconstruct-ce-release-logs
+          path: |
+            build/reports/**
+            build/test-results/**
+            run/**/logs/**
+            release-notes.md
+          if-no-files-found: ignore

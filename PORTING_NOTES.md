@@ -6,6 +6,9 @@
 - Java source trees for upstream TConstruct/Mantle were not present in this workspace, so this pass uses the compiled jars as behavioral/content references and implements a focused NeoForge foundation in source.
 - Target: Minecraft `1.21.1`, NeoForge `21.1.230`, Java `21` target from the template.
 - Community mod id: `tconstruct_ce`.
+- Community port maintainer: `gfaraujosousa`.
+- Original authors: SlimeKnights and contributors.
+- This is not an official SlimeKnights build.
 
 ## API Replacements Started
 
@@ -13,6 +16,50 @@
 - Old registry events: replaced with NeoForge `DeferredRegister`.
 - Old ItemStack NBT/share tag tool data: started as a typed `DataComponentType<ToolStackData>` with a codec-backed immutable record.
 - Old recipe serializers: early custom recipe serializers use 1.21.1 `MapCodec` and `StreamCodec`.
+
+## Reverse Engineering Inventory
+
+- Generated ignored jar listings:
+  - `reverse_engineering/tconstruct_jar_listing.txt`
+  - `reverse_engineering/mantle_jar_listing.txt`
+- Extracted selected upstream resources into ignored folders:
+  - `reverse_engineering/tconstruct_resources/`
+  - `reverse_engineering/mantle_resources/`
+- TConstruct jar findings:
+  - `29731` jar entries.
+  - `2400` Java classes.
+  - `5378` data resources.
+  - `19710` asset resources.
+  - `44` tool definition JSONs.
+  - `91` material definition JSONs, `86` material stat JSONs, and `86` material trait JSONs.
+  - `222` modifier JSONs.
+  - `23` station layout JSONs.
+  - `2950` recipe JSONs.
+- Mantle jar findings:
+  - `1004` jar entries.
+  - `783` Java classes.
+  - Main dependency areas: data/load helpers, recipe helpers, registration wrappers, inventory/menu sync, fluid helpers, networking wrappers, and book/client UI.
+- Detailed inventory is tracked in `REVERSE_ENGINEERING_NOTES.md`.
+- Feature status and priorities are tracked in `FEATURE_PARITY_MATRIX.md`.
+- Migration execution checklist is tracked in `MIGRATION_CHECKLIST.md`.
+
+## CI/CD And Release Automation
+
+- Added GitHub Actions CI in `.github/workflows/ci.yml`.
+  - Validates wrapper files.
+  - Uses Temurin Java 21.
+  - Runs `./gradlew --version`, `./gradlew clean build`, `./gradlew runData`, `./gradlew runGameTestServer`, and a timeout-bounded `./gradlew runServer` startup smoke test.
+  - Uploads jars, generated resources, reports, and logs as workflow artifacts.
+- Added `.github/workflows/release.yml`.
+  - Publishes GitHub Releases from tags matching `v*.*.*` and `v*.*.*-*`, or manual dispatch.
+  - Fails if the release tag/input version does not match `mod_version` in `gradle.properties`.
+  - Attaches built jars, changelog, README, porting notes, and license template.
+  - Does not publish to CurseForge, Modrinth, or Maven.
+- Added `.github/workflows/nightly.yml` for unstable workflow artifacts only.
+- Added `.github/dependabot.yml` for GitHub Actions and Gradle update review.
+- Added `CHANGELOG.md` and `RELEASE_CHECKLIST.md`.
+- Updated artifact base name to `tconstruct-ce-neoforge-1.21.1`.
+- Changed current mod version to `0.1.0-alpha.1` to match the documented alpha porting phase.
 
 ## Implemented In This Pass
 
@@ -59,3 +106,5 @@
 - Upstream Java source code was not supplied, only compiled jars. A full architecture-preserving port needs the source tree or a deliberate clean-room reimplementation plan.
 - The local PATH exposes `java.exe` but not `jar.exe`; jar inspection used `C:\Program Files\Java\jdk-20\bin\jar.exe`.
 - The shell `java` on PATH is Java 20, but Gradle resolved and used an Eclipse Adoptium Java 21 toolchain for NeoForge run tasks.
+- No Java decompiler command was found on PATH during the reverse-engineering pass. Current notes use resources, class listings, metadata, and selected `javap` signatures.
+- GitHub Actions workflows have not yet run remotely in this workspace; validate them after pushing to the repository.
