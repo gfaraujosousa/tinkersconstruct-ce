@@ -8,6 +8,9 @@ on:
 permissions:
   contents: read
 
+env:
+  NEOGRADLE_CI_ARGS: -Pnet.neoforged.gradle.caching.enabled=false -Pneogradle.subsystems.decompiler.enabled=true
+
 jobs:
   nightly:
     name: Build Nightly Artifact
@@ -30,7 +33,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build nightly
-        run: ./gradlew clean build runData --no-build-cache
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS clean build runData --no-build-cache
 
       - name: Upload nightly jars
         uses: actions/upload-artifact@v4

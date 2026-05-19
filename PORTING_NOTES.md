@@ -68,9 +68,10 @@
 - Added `CHANGELOG.md` and `RELEASE_CHECKLIST.md`.
 - Updated artifact base name to `tconstruct-ce-neoforge-1.21.1`.
 - Changed current mod version to `0.1.0-alpha.1` to match the documented alpha porting phase.
-- CI/release/nightly Gradle invocations now use `--no-build-cache` for NeoGradle tasks after GitHub Actions restored incomplete NeoForm transform cache state that referenced a missing `ats/accesstransformer.cfg`.
-- Refined the NeoForm access transformer workaround to inspect `neoFormTransformSource.transformers.files` directly and create only missing generated `build/tmp/.cache/expanded/**/ats/accesstransformer.cfg` entries immediately before JST runs. This avoids guessing by directory scan and leaves real project AT misconfiguration visible.
-- CI build and datagen commands now include `--stacktrace` so any remaining GitHub-only NeoGradle failure has actionable logs.
+- CI/release/nightly Gradle invocations now use `--no-build-cache` plus `-Pnet.neoforged.gradle.caching.enabled=false` for NeoGradle tasks after GitHub Actions hit an incomplete generated NeoForm access-transformer path at `build/tmp/.cache/expanded/**/ats/accesstransformer.cfg`.
+- GitHub Actions sets `CI=true` by default. NeoGradle 7.1.x treats that as a signal to alter the userdev pipeline, which made the remote Ubuntu build diverge from the local Windows build before project code compiled. Workflow Gradle steps now override `CI=false` only for the Gradle process and explicitly request `-Pneogradle.subsystems.decompiler.enabled=true` so Actions uses the same source-transform path as local validation.
+- Refined the NeoForm access transformer workaround to inspect the actual `neoFormTransformSource` JST runtime arguments and create only missing generated `build/tmp/.cache/expanded/**/ats/accesstransformer.cfg` entries immediately before JST runs. The fallback content is copied from the resolved NeoForge userdev jar instead of using an empty placeholder, and real project AT misconfiguration remains visible.
+- CI build and datagen commands include `--stacktrace` so any remaining GitHub-only NeoGradle failure has actionable logs.
 
 ## Implemented In This Pass
 
@@ -110,6 +111,10 @@
   - Passed after the NeoForm transformer fallback was refined.
 - `.\gradlew.bat runData --no-build-cache`
   - Passed after selected upstream visual assets were imported.
+- GitHub Actions build/datagen behavior:
+  - `Build And Datagen` runs `clean build` first. If that step fails, `runData`, jar upload, Game Tests, and Dedicated Server Smoke are skipped by GitHub's normal job dependency rules.
+  - The repeated remote failure happened before CE Java/resources were compiled: NeoGradle's `neoFormTransformSource` task attempted to parse a generated/extracted NeoForge access transformer file that did not exist in the CI workspace.
+  - The workflow now forces Gradle validation onto the local-equivalent NeoGradle source path and disables NeoGradle's separate centralized transform cache for CI validation.
 - `.\gradlew.bat runServer`
   - Reached dedicated server startup. Log line: `Done (23.433s)! For help, type "help"`.
   - The command was stopped by the smoke-test timeout because a dedicated server remains running by design.

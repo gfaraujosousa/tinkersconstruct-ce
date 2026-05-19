@@ -17,6 +17,9 @@ on:
 permissions:
   contents: read
 
+env:
+  NEOGRADLE_CI_ARGS: -Pnet.neoforged.gradle.caching.enabled=false -Pneogradle.subsystems.decompiler.enabled=true
+
 jobs:
   validate-wrapper:
     name: Validate Gradle Wrapper
@@ -72,10 +75,14 @@ jobs:
         run: ./gradlew --version
 
       - name: Build
-        run: ./gradlew clean build --no-build-cache --stacktrace
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS clean build --no-build-cache --stacktrace
 
       - name: Run datagen
-        run: ./gradlew runData --no-build-cache --stacktrace
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS runData --no-build-cache --stacktrace
 
       - name: Upload jars
         uses: actions/upload-artifact@v4
@@ -123,7 +130,9 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run GameTest server
-        run: ./gradlew runGameTestServer --no-build-cache
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS runGameTestServer --no-build-cache
 
       - name: Upload game test logs
         if: always()
@@ -155,9 +164,11 @@ jobs:
 
       - name: Run dedicated server startup smoke test
         shell: bash
+        env:
+          CI: 'false'
         run: |
           set +e
-          timeout 180s ./gradlew runServer --no-build-cache
+          timeout 180s ./gradlew $NEOGRADLE_CI_ARGS runServer --no-build-cache
           code=$?
           set -e
           if [ "$code" -eq 124 ]; then

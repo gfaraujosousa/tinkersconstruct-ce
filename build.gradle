@@ -42,26 +42,49 @@ java {
 //minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 //minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
 
-// NeoGradle 7.1.x can pass a generated NeoForm access transformer path to JST even
-// when the upstream NeoForm zip has no ats/accesstransformer.cfg entry. Create only
-// that specific missing generated file immediately before JST runs. Project AT files
-// should still fail normally if they are configured incorrectly.
+// NeoGradle 7.1.x can pass a generated NeoForge userdev access transformer path
+// to JST before the extracted copy exists in some CI/cache layouts. If that
+// generated copy is missing, restore it from the resolved NeoForge userdev jar.
+// Project AT files should still fail normally if they are configured incorrectly.
 def neoFormExpandedRoot = layout.buildDirectory.dir('tmp/.cache/expanded')
+def neoForgeUserdevAccessTransformer = configurations.create('neoForgeUserdevAccessTransformer') {
+    canBeConsumed = false
+    canBeResolved = true
+    transitive = false
+}
 
 tasks.matching { it.name == 'neoFormTransformSource' }.configureEach {
     doFirst('prepareNeoFormAccessTransformerFallback') {
         File expandedRoot = neoFormExpandedRoot.get().asFile
-        File expandedRootCanonical = expandedRoot.canonicalFile
+        String expandedRootPath = expandedRoot.absoluteFile.toPath().normalize().toString() + File.separator
+        String fallbackAccessTransformer = null
 
-        transformers.files.each { File configuredTransformer ->
-            File transformerCanonical = configuredTransformer.canonicalFile
-            boolean isNeoFormGeneratedTransformer = transformerCanonical.path.startsWith(expandedRootCanonical.path + File.separator)
-                    && transformerCanonical.path.endsWith("${File.separator}ats${File.separator}accesstransformer.cfg")
+        List<String> runtimeArgs = runtimeProgramArguments.get()
+        runtimeArgs.eachWithIndex { String arg, int index ->
+            if (arg != '--access-transformer' || index + 1 >= runtimeArgs.size()) {
+                return
+            }
 
-            if (isNeoFormGeneratedTransformer && !transformerCanonical.isFile()) {
-                transformerCanonical.parentFile.mkdirs()
-                transformerCanonical.text = '# Empty fallback generated for NeoGradle source transform.\n'
-                logger.lifecycle("Created missing NeoForm access transformer fallback: ${transformerCanonical}")
+            File configuredTransformer = new File(runtimeArgs[index + 1])
+            File transformerFile = configuredTransformer.absoluteFile.toPath().normalize().toFile()
+            boolean isNeoFormGeneratedTransformer = transformerFile.path.startsWith(expandedRootPath)
+                    && transformerFile.path.endsWith("${File.separator}ats${File.separator}accesstransformer.cfg")
+
+            if (isNeoFormGeneratedTransformer && !transformerFile.isFile()) {
+                if (fallbackAccessTransformer == null) {
+                    File userdevJar = neoForgeUserdevAccessTransformer.singleFile
+                    new java.util.zip.ZipFile(userdevJar).withCloseable { zipFile ->
+                        java.util.zip.ZipEntry accessTransformerEntry = zipFile.getEntry('ats/accesstransformer.cfg')
+                        if (accessTransformerEntry == null) {
+                            throw new GradleException("Expected ats/accesstransformer.cfg in ${userdevJar}.")
+                        }
+                        fallbackAccessTransformer = zipFile.getInputStream(accessTransformerEntry).getText('UTF-8')
+                    }
+                }
+
+                transformerFile.parentFile.mkdirs()
+                transformerFile.setText(fallbackAccessTransformer, 'UTF-8')
+                logger.lifecycle("Created missing NeoForm access transformer fallback: ${transformerFile}")
             }
         }
     }
@@ -131,6 +154,7 @@ dependencies {
     // And its provides the option to then use net.minecraft as the group, and one of; client, server or joined as the module name, plus the game version as version.
     // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
     implementation "net.neoforged:neoforge:${neo_version}"
+    add('neoForgeUserdevAccessTransformer', "net.neoforged:neoforge:${neo_version}:userdev")
 
     // Example optional mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

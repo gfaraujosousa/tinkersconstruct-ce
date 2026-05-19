@@ -25,6 +25,9 @@ on:
 permissions:
   contents: write
 
+env:
+  NEOGRADLE_CI_ARGS: -Pnet.neoforged.gradle.caching.enabled=false -Pneogradle.subsystems.decompiler.enabled=true
+
 jobs:
   release:
     name: Build And Publish GitHub Release
@@ -84,10 +87,14 @@ jobs:
           echo "draft=$draft" >> "$GITHUB_OUTPUT"
 
       - name: Build release artifacts
-        run: ./gradlew clean build runData --no-build-cache
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS clean build runData --no-build-cache
 
       - name: Run GameTest server
-        run: ./gradlew runGameTestServer --no-build-cache
+        env:
+          CI: 'false'
+        run: ./gradlew $NEOGRADLE_CI_ARGS runGameTestServer --no-build-cache
 
       - name: Generate release notes
         shell: bash
