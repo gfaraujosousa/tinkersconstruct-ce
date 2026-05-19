@@ -1,10 +1,14 @@
 # Tinkers' Construct Community Edition
 
+[![CI](https://github.com/gfaraujosousa/tinkersconstruct-ce/actions/workflows/ci.yml/badge.svg)](https://github.com/gfaraujosousa/tinkersconstruct-ce/actions/workflows/ci.yml)
+[![Latest Release](https://img.shields.io/github/v/release/gfaraujosousa/tinkersconstruct-ce?include_prereleases&label=release)](https://github.com/gfaraujosousa/tinkersconstruct-ce/releases)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](TEMPLATE_LICENSE.txt)
+[![Minecraft 1.21.1](https://img.shields.io/badge/Minecraft-1.21.1-62b47a)](https://www.minecraft.net/)
+[![NeoForge 21.1.230](https://img.shields.io/badge/NeoForge-21.1.230-f16436)](https://neoforged.net/)
+
 Tinkers' Construct Community Edition is an unofficial community port/fork maintained by gfaraujosousa. Original Tinkers' Construct and Mantle are by SlimeKnights and contributors.
 
 This repository targets Minecraft 1.21.1 on NeoForge using the existing NeoForge Gradle template. It is not an official SlimeKnights release and should not be represented as one.
-
-Badges are intentionally omitted until the public GitHub repository URL is known.
 
 ## Current Port Scope
 
