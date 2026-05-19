@@ -168,12 +168,15 @@ jobs:
           CI: 'false'
         run: |
           set -u
-          ./gradlew $NEOGRADLE_CI_ARGS runServer --no-build-cache --stacktrace &
+          server_output="run-server-smoke.log"
+          : > "$server_output"
+
+          ./gradlew $NEOGRADLE_CI_ARGS runServer --no-build-cache --stacktrace > "$server_output" 2>&1 &
           gradle_pid=$!
-          deadline=$((SECONDS + 600))
+          deadline=$((SECONDS + 900))
 
           while kill -0 "$gradle_pid" 2>/dev/null; do
-            if grep -R "Done (" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
+            if grep -R "Done (" "$server_output" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
               echo "Server reached startup."
               kill "$gradle_pid" 2>/dev/null || true
               wait "$gradle_pid" 2>/dev/null || true
@@ -182,6 +185,14 @@ jobs:
 
             if [ "$SECONDS" -ge "$deadline" ]; then
               echo "Server timed out before startup."
+              echo "=== runServer output tail ==="
+              tail -n 200 "$server_output" || true
+              echo "=== discovered run logs ==="
+              find run -maxdepth 5 -type f -path "*/logs/*" -print 2>/dev/null || true
+              for log_file in $(find run -maxdepth 5 -type f -path "*/logs/latest.log" 2>/dev/null); do
+                echo "=== ${log_file} tail ==="
+                tail -n 200 "$log_file" || true
+              done
               kill "$gradle_pid" 2>/dev/null || true
               wait "$gradle_pid" 2>/dev/null || true
               exit 1
@@ -192,10 +203,12 @@ jobs:
 
           wait "$gradle_pid"
           code=$?
-          if grep -R "Done (" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
+          if grep -R "Done (" "$server_output" run/server/logs/latest.log run/logs/latest.log 2>/dev/null; then
             echo "Server reached startup before Gradle exited."
             exit 0
           fi
+          echo "=== runServer output tail ==="
+          tail -n 200 "$server_output" || true
           exit "$code"
 
       - name: Upload server logs
@@ -203,5 +216,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: tconstruct-ce-server-smoke-logs
-          path: run/**/logs/**
+          path: |
+            run/**/logs/**
+            run-server-smoke.log
           if-no-files-found: ignore

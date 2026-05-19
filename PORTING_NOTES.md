@@ -115,7 +115,7 @@
   - `Build And Datagen` runs `clean build` first. If that step fails, `runData`, jar upload, Game Tests, and Dedicated Server Smoke are skipped by GitHub's normal job dependency rules.
   - The repeated remote failure happened before CE Java/resources were compiled: NeoGradle's `neoFormTransformSource` task attempted to parse a generated/extracted NeoForge access transformer file that did not exist in the CI workspace.
   - The workflow now forces Gradle validation onto the local-equivalent NeoGradle source path and disables NeoGradle's separate centralized transform cache for CI validation.
-  - The dedicated server smoke test now starts `runServer` in the background, polls server logs for `Done (`, and stops as soon as startup is confirmed. This avoids failing slow fresh NeoGradle setup jobs just because the old fixed `180s` timeout killed Gradle before the server had a chance to write its startup log.
+  - The dedicated server smoke test now starts `runServer` in the background, captures stdout to `run-server-smoke.log`, polls stdout and server logs for `Done (`, and stops as soon as startup is confirmed. On timeout it prints Gradle and Minecraft log tails before failing, which makes future CI-only startup issues diagnosable from the public job page.
 - `.\gradlew.bat runServer`
   - Reached dedicated server startup. Log line: `Done (23.433s)! For help, type "help"`.
   - The command was stopped by the smoke-test timeout because a dedicated server remains running by design.
